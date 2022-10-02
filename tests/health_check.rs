@@ -1,9 +1,6 @@
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
-use zero2prod::{
-    configuration::{get_configuration, DatabaseSettings},
-    startup::run,
-};
+use zero2prod::{configuration::get_configuration, startup::run};
 
 const BIND_ADDR: &str = "127.0.0.1:0";
 
@@ -90,7 +87,7 @@ async fn spawn_app() -> TestApp {
     let port = listener.local_addr().unwrap().port();
 
     let address = format!("127.0.0.1:{}", port);
-    let mut configuration = get_configuration().expect("Failed to read configuration.");
+    let configuration = get_configuration().expect("Failed to read configuration.");
     let db_pool = PgPool::connect(&configuration.database.connection_string())
         .await
         .expect("Failed to connect to Postgres.");
@@ -108,7 +105,7 @@ pub async fn clean_db() {
         .expect("Failed to connect to Postgres");
 
     connection
-        .execute(format!(r#"DELETE FROM subscriptions; "#).as_str())
+        .execute("DELETE FROM subscriptions;")
         .await
         .expect("Failed to cleanup database.");
 }

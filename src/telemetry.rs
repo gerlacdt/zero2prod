@@ -1,12 +1,20 @@
 use tracing::subscriber::{set_global_default, Subscriber};
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_log::LogTracer;
+use tracing_subscriber::fmt::MakeWriter;
 use tracing_subscriber::{fmt::Layer, layer::SubscriberExt, EnvFilter, Registry};
 
-pub fn get_subscriber(name: String, env_filter: String) -> impl Subscriber + Send + Sync {
+pub fn get_subscriber<Sink>(
+    name: String,
+    env_filter: String,
+    sink: Sink,
+) -> impl Subscriber + Send + Sync
+where
+    Sink: for<'a> MakeWriter<'a> + Send + Sync + 'static,
+{
     let env_filter =
         EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(env_filter));
-    let formatting_layer = BunyanFormattingLayer::new(name, std::io::stdout);
+    let formatting_layer = BunyanFormattingLayer::new(name, sink);
     Registry::default()
         .with(env_filter)
         .with(JsonStorageLayer)
@@ -22,7 +30,7 @@ pub fn configure_tracing() {
     LogTracer::init().expect("Failed to set logger");
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
 
-    if std::env::var("DEBUG").is_ok() {
+    if std::env::var("TEST_LOG").is_ok() {
         let formatting_layer = Layer::default();
         let subscriber = Registry::default()
             .with(env_filter)

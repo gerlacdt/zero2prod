@@ -3,7 +3,7 @@ build:
 	cargo build
 
 dev:
-	DEBUG=true cargo watch -x check -x test -x run
+	TEST_LOG=true cargo watch -x check -x test -x run
 
 run:
 	cargo run

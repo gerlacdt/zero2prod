@@ -22,7 +22,6 @@ db-connect:
 
 
 docker-build:
-	cp ./target/debug/zero2prod .
 	docker build -t zero2prod .
 
 docker-run:

@@ -1,4 +1,4 @@
-.PHONY=dev build test db-connect db-migrate
+.PHONY=dev build test db-connect db-migrate docker-build docker-run
 build:
 	cargo build
 
@@ -19,3 +19,11 @@ db-migrate:
 
 db-connect:
 	PGPASSWORD=password psql -h localhost -p 5431 -U postgres -d newsletter
+
+
+docker-build:
+	cp ./target/debug/zero2prod .
+	docker build -t zero2prod .
+
+docker-run:
+	docker run --network=host -p 8000:8000 zero2prod:latest

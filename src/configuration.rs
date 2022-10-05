@@ -1,5 +1,6 @@
 use secrecy::{ExposeSecret, Secret};
 use std::convert::{TryFrom, TryInto};
+use tracing::log;
 
 #[derive(serde::Deserialize)]
 pub struct Settings {
@@ -56,7 +57,7 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
 
     let environment_filename = format!("{}.yaml", environment.as_str());
 
-    println!("config file: {}", environment_filename);
+    log::info!("config file: {}", environment_filename);
     let settings = config::Config::builder()
         .add_source(config::File::from(config::File::from(
             configuration_directory.join("base.yaml"),

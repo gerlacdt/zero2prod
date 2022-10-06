@@ -50,6 +50,35 @@ async fn subscribe_returns_200_for_valid_form_data() {
 }
 
 #[tokio::test]
+async fn subscribe_returns_200_when_fields_are_present_but_empty() {
+    clean_db().await;
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+    let test_cases = vec![
+        ("name=&email=ursula_le_guin%40gmail.com", "empty name"),
+        ("name=Ursula&email=", "empty email"),
+        ("name=Ursula&email=definitely-not-an-email", "invalid email"),
+    ];
+
+    for (body, description) in test_cases {
+        let response = client
+            .post(&format!("http://{}/subscriptions", &app.address))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
+            .send()
+            .await
+            .expect("Faild to execute POST request");
+
+        assert_eq!(
+            400,
+            response.status().as_u16(),
+            "The API did not return a 200 OK when the payload was {}",
+            description
+        )
+    }
+}
+
+#[tokio::test]
 async fn subscribe_returns_400_when_data_is_missing() {
     let app = spawn_app().await;
     clean_db().await;

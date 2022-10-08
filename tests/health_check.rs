@@ -1,7 +1,9 @@
 use once_cell::sync::Lazy;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
-use zero2prod::{configuration::get_configuration, startup::run, telemetry};
+use zero2prod::{
+    configuration::get_configuration, email_client::EmailClient, startup::run, telemetry,
+};
 
 const BIND_ADDR: &str = "127.0.0.1:0";
 
@@ -112,11 +114,11 @@ static TRACING: Lazy<()> = Lazy::new(|| {
     let subscriber_name = "test".to_string();
     if std::env::var("TEST_LOG").is_ok() {
         let subscriber =
-            telemetry::get_subscriber(subscriber_name, default_filter_level, std::io::stdout);
+            telemetry::get_json_subscriber(subscriber_name, default_filter_level, std::io::stdout);
         telemetry::init_subscriber(subscriber);
     } else {
         let subscriber =
-            telemetry::get_subscriber(subscriber_name, default_filter_level, std::io::sink);
+            telemetry::get_json_subscriber(subscriber_name, default_filter_level, std::io::sink);
         telemetry::init_subscriber(subscriber);
     }
 });
@@ -138,7 +140,18 @@ async fn spawn_app() -> TestApp {
         .await
         .expect("Failed to connect to Postgres.");
 
-    let server = run(listener, db_pool.clone()).expect("Failed to bind address");
+    let sender_email = configuration
+        .email_client
+        .sender()
+        .expect("Invalid sender email address.");
+
+    let email_client = EmailClient::new(
+        configuration.email_client.base_url,
+        sender_email,
+        configuration.email_client.authorization_token,
+    );
+
+    let server = run(listener, db_pool.clone(), email_client).expect("Failed to bind address");
     let _ = tokio::spawn(server);
     TestApp { address, db_pool }
 }

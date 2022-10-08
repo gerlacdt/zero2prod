@@ -3,7 +3,7 @@ build:
 	cargo build
 
 dev:
-	cargo watch -x check -x test -x run
+	cargo watch -x check -x test
 
 run:
 	cargo run
@@ -11,10 +11,10 @@ run:
 test:
 	cargo test
 
-db-run:
+db-migrate:
 	SKIP_DOCKER=true ./scripts/init_db.sh
 
-db-migrate:
+db-run:
 	./scripts/init_db.sh
 
 db-connect:

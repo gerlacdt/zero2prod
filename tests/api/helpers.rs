@@ -2,7 +2,8 @@ use once_cell::sync::Lazy;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use std::net::TcpListener;
 use zero2prod::{
-    configuration::get_configuration, email_client::EmailClient, startup::run, telemetry,
+    configuration::get_configuration, email_client::EmailClient, startup::run,
+    startup::Application, telemetry,
 };
 
 const BIND_ADDR: &str = "127.0.0.1:0";

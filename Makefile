@@ -3,7 +3,7 @@ build:
 	cargo build
 
 dev:
-	cargo watch -x check -x test
+	cargo watch -x check -x "test -- --test-threads 1"
 
 run:
 	cargo run

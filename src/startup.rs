@@ -1,4 +1,4 @@
-use crate::configuration::{self, DatabaseSettings};
+use crate::configuration::DatabaseSettings;
 use crate::email_client::EmailClient;
 use crate::{configuration::Settings, routes};
 use actix_web::dev::Server;
@@ -16,6 +16,10 @@ pub struct Application {
 impl Application {
     pub async fn build(configuration: Settings) -> Result<Self, std::io::Error> {
         let connection_pool = get_connection_pool(&configuration.database);
+        println!(
+            "DEBUG {}:{}",
+            configuration.application.host, configuration.application.port
+        );
         let listener = TcpListener::bind(format!(
             "{}:{}",
             configuration.application.host, configuration.application.port

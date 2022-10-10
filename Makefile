@@ -5,6 +5,9 @@ dev:
 db-migrate:
 	SKIP_DOCKER=true ./scripts/init_db.sh
 
+db-drop:
+	./scripts/drop_db.sh
+
 db-run:
 	./scripts/init_db.sh
 

@@ -27,14 +27,17 @@ pub async fn subscribe(
     email_client: web::Data<EmailClient>,
     base_url: web::Data<ApplicationBaseUrl>,
 ) -> HttpResponse {
+    println!("before new_subscriber");
     let new_subscriber = match form.0.try_into() {
         Ok(subscriber) => subscriber,
         Err(_) => return HttpResponse::BadRequest().finish(),
     };
+    println!("before insert_subscriber");
     if insert_subscriber(&pool, &new_subscriber).await.is_err() {
         return HttpResponse::InternalServerError().finish();
     }
 
+    println!("before send confirmation email");
     if send_confirmation_email(&email_client, new_subscriber, &base_url.0)
         .await
         .is_err()
@@ -42,6 +45,7 @@ pub async fn subscribe(
         return HttpResponse::InternalServerError().finish();
     }
 
+    println!("after logic");
     HttpResponse::Ok().finish()
 }
 

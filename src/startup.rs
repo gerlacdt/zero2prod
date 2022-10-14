@@ -16,10 +16,6 @@ pub struct Application {
 impl Application {
     pub async fn build(configuration: Settings) -> Result<Self, std::io::Error> {
         let connection_pool = get_connection_pool(&configuration.database);
-        println!(
-            "DEBUG {}:{}",
-            configuration.application.host, configuration.application.port
-        );
         let listener = TcpListener::bind(format!(
             "{}:{}",
             configuration.application.host, configuration.application.port
@@ -74,6 +70,7 @@ pub fn run(
 ) -> Result<Server, std::io::Error> {
     let connection = web::Data::new(db_pool);
     let email_client = web::Data::new(email_client);
+    let base_url = web::Data::new(ApplicationBaseUrl(base_url));
     let server = HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())

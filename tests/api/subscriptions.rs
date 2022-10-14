@@ -18,8 +18,6 @@ async fn subscribe_returns_200_for_valid_form_data() {
 
     let response = app.post_subscriptions(body.into()).await;
 
-    println!("{:?}", response);
-
     assert_eq!(200, response.status().as_u16());
 }
 

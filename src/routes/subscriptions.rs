@@ -44,7 +44,7 @@ pub async fn subscribe(
         Err(_) => return HttpResponse::InternalServerError().finish(),
     };
 
-    let subscriber_token = &generate_subscription_token();
+    let subscriber_token = generate_subscription_token();
     if store_token(&mut transaction, subscriber_id, &subscriber_token)
         .await
         .is_err()

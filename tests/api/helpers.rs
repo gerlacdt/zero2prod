@@ -100,7 +100,12 @@ pub async fn clean_db() {
         .expect("Failed to connect to Postgres");
 
     connection
+        .execute("DELETE FROM subscription_tokens")
+        .await
+        .expect("Failed to clean up database, table: subscription_tokens");
+
+    connection
         .execute("DELETE FROM subscriptions;")
         .await
-        .expect("Failed to cleanup database.");
+        .expect("Failed to cleanup database, table: subscriptions.");
 }

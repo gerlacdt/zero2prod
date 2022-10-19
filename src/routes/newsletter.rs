@@ -1,4 +1,5 @@
 use super::error_chain_fmt;
+use crate::domain::SubscriberEmail;
 use crate::email_client::EmailClient;
 use actix_web::{web, HttpResponse, ResponseError};
 use anyhow::Context;
@@ -46,27 +47,34 @@ pub async fn publish_newsletter(
     for subscriber in subscribers {
         email_client
             .send_email(
-                subscriber.email,
+                subscriber.email.clone(),
                 &body.title,
                 &body.content.html,
                 &body.content.text,
             )
             .await
-            .with_context(|| format!("Failed to send newsletter issue to {}", subscriber.email))?;
+            .with_context(|| {
+                format!("Failed to send newsletter issue to {:?}", subscriber.email)
+            })?;
     }
     Ok(HttpResponse::Ok().finish())
 }
 
+#[derive(Debug, Clone)]
 struct ConfirmedSubscriber {
-    email: String,
+    email: SubscriberEmail,
 }
 
 #[tracing::instrument(name = "Get confirmed subscribers", skip(pool))]
 async fn get_confirmed_subscribers(
     pool: &PgPool,
 ) -> Result<Vec<ConfirmedSubscriber>, anyhow::Error> {
+    struct Row {
+        email: String,
+    }
+
     let rows = sqlx::query_as!(
-        ConfirmedSubscriber,
+        Row,
         r#"
 SELECT email
 FROM subscriptions
@@ -76,5 +84,19 @@ WHERE status = 'confirmed'
     .fetch_all(pool)
     .await?;
 
-    Ok(rows)
+    let confirmed_subscribers: Vec<_> = rows
+        .into_iter()
+        .filter_map(|r| match SubscriberEmail::parse(r.email) {
+            Ok(email) => Some(ConfirmedSubscriber { email }),
+            Err(error) => {
+                tracing::warn!(
+                    "A confirmed subscriber is using an invalid email address.\n{}",
+                    error
+                );
+                None
+            }
+        })
+        .collect();
+
+    Ok(confirmed_subscribers)
 }

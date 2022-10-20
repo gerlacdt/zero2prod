@@ -60,6 +60,7 @@ async fn newsletters_are_delivered_to_confirmed_subscribers() {
 
 #[tokio::test]
 async fn newsletters_returns_400_for_invalid_data() {
+    clean_db().await;
     // Arrange
     let app = spawn_app().await;
     let test_cases = vec![
@@ -88,6 +89,31 @@ async fn newsletters_returns_400_for_invalid_data() {
             error_message
         );
     }
+}
+
+#[tokio::test]
+async fn requests_missing_authentication_are_rejected() {
+    clean_db().await;
+    let app = spawn_app().await;
+
+    let response = reqwest::Client::new()
+        .post(&format!("{}/newsletters", &app.address))
+        .json(&serde_json::json!({
+        "title": "Newsletter title",
+        "content": {
+            "text": "Newsletter body as plain text",
+            "html": "<p>Newsletter body as HTML</p>",
+        }
+        }))
+        .send()
+        .await
+        .expect("Failed to execute request");
+
+    assert_eq!(401, response.status().as_u16());
+    assert_eq!(
+        r#"Basic realm="publish""#,
+        response.headers()["WWW-Authenticate"]
+    );
 }
 
 /// Use the public API of the application under test to create

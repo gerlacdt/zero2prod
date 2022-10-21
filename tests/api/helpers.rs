@@ -13,13 +13,12 @@ static TRACING: Lazy<()> = Lazy::new(|| {
     let default_filter_level = "info".to_string();
     let subscriber_name = "test".to_string();
     if std::env::var("TEST_LOG").is_ok() {
-        // let subscriber =
-        //     telemetry::get_json_subscriber(subscriber_name, default_filter_level, std::io::stdout);
-        let subscriber = telemetry::get_subscriber(default_filter_level);
+        let subscriber =
+            telemetry::get_subscriber(subscriber_name, default_filter_level, std::io::stdout);
         telemetry::init_subscriber(subscriber);
     } else {
         let subscriber =
-            telemetry::get_json_subscriber(subscriber_name, default_filter_level, std::io::sink);
+            telemetry::get_subscriber(subscriber_name, default_filter_level, std::io::sink);
         telemetry::init_subscriber(subscriber);
     }
 });

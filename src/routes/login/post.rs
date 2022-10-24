@@ -3,7 +3,6 @@ use actix_web::error::InternalError;
 use actix_web::http::header::LOCATION;
 use actix_web::HttpResponse;
 use actix_web::{http::StatusCode, web, ResponseError};
-use hmac::{Hmac, Mac};
 use secrecy::{ExposeSecret, Secret};
 use sqlx::PgPool;
 

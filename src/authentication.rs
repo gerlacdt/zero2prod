@@ -43,7 +43,7 @@ pub async fn validate_credentials(
     .context("Failed to spawn blocking task")??;
 
     user_id
-        .ok_or_else(|| anyhow::anyhow!("Unknow username"))
+        .ok_or_else(|| anyhow::anyhow!("Unknown username"))
         .map_err(AuthError::InvalidCredentials)
 }
 

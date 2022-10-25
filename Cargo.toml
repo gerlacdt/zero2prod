@@ -36,6 +36,7 @@ argon2 = { version = "0.4", features = ["std"] }
 urlencoding = "2"
 htmlescape = "0.3"
 actix-web-flash-messages = { version = "0.4", features = ["cookies"] }
+actix-session = {version = "0.6", features = ["redis-rs-tls-session"] }
 
 [dependencies.sqlx]
 version = "0.6"

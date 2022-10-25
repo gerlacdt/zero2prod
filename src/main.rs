@@ -3,7 +3,7 @@ use zero2prod::startup::Application;
 use zero2prod::telemetry::{get_subscriber, init_subscriber};
 
 #[tokio::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> anyhow::Result<()> {
     init_tracing();
     let configuration = get_configuration().expect("Failed to read configuration.");
     let application = Application::build(configuration).await?;

@@ -1,22 +1,6 @@
-use crate::startup::HmacSecret;
-use actix_web::cookie::{time::Duration, Cookie};
-use actix_web::{http::header::ContentType, web, HttpRequest, HttpResponse};
+use actix_web::{http::header::ContentType, HttpResponse};
 use actix_web_flash_messages::{IncomingFlashMessages, Level};
 use std::fmt::Write;
-
-#[derive(serde::Deserialize)]
-pub struct QueryParams {
-    error: String,
-    tag: String,
-}
-
-impl QueryParams {
-    fn verify(self, secret: &HmacSecret) -> Result<String, anyhow::Error> {
-        let query_string = format!("error={}", urlencoding::Encoded::new(&self.error));
-
-        Ok(self.error)
-    }
-}
 
 pub async fn login_form(flash_messages: IncomingFlashMessages) -> HttpResponse {
     let mut error_html = String::new();

@@ -199,6 +199,11 @@ pub async fn clean_db() {
         .execute("DELETE FROM subscriptions;")
         .await
         .expect("Failed to cleanup database, table: subscriptions.");
+
+    connection
+        .execute("DELETE FROM users where username != 'admin';")
+        .await
+        .expect("Failed to cleanup database, table: subscriptions.");
 }
 
 pub struct TestUser {

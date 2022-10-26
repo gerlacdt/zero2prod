@@ -61,6 +61,7 @@ async fn new_password_fields_must_match() {
 
 #[tokio::test]
 async fn current_password_must_be_valid() {
+    clean_db().await;
     // Arrange
     let app = spawn_app().await;
     let new_password = Uuid::new_v4().to_string();

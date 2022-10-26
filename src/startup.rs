@@ -1,6 +1,6 @@
 use crate::configuration::DatabaseSettings;
 use crate::email_client::EmailClient;
-use crate::routes::admin_dashboard;
+use crate::routes::{admin_dashboard, change_password, change_password_form};
 use crate::{configuration::Settings, routes};
 use actix_session::storage::RedisSessionStore;
 use actix_session::SessionMiddleware;
@@ -102,6 +102,8 @@ async fn run(
             .route("/login", web::get().to(routes::login_form))
             .route("/login", web::post().to(routes::login))
             .route("/admin/dashboard", web::get().to(admin_dashboard))
+            .route("/admin/password", web::get().to(change_password_form))
+            .route("/admin/password", web::post().to(change_password))
             .app_data(connection.clone())
             .app_data(email_client.clone())
             .app_data(base_url.clone())

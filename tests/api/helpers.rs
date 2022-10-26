@@ -122,6 +122,10 @@ impl TestApp {
             .expect("Failed to execute request")
     }
 
+    pub async fn get_change_password_html(&self) -> String {
+        self.get_change_password().await.text().await.unwrap()
+    }
+
     pub async fn post_change_password<Body>(&self, body: &Body) -> reqwest::Response
     where
         Body: serde::Serialize,
@@ -200,8 +204,8 @@ impl TestUser {
         Self {
             user_id: Uuid::new_v4(),
             username: Uuid::new_v4().to_string(),
-            password: Uuid::new_v4().to_string(),
-            // password: "everythinghastostartsomewhere".into(),
+            //password: Uuid::new_v4().to_string(),
+            password: "everythinghastostartsomewhere".into(),
         }
     }
 
@@ -218,7 +222,6 @@ impl TestUser {
         .unwrap()
         .to_string();
 
-        println!("#########################################");
         dbg!(&password_hash);
 
         sqlx::query!(

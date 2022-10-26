@@ -3,6 +3,10 @@ dev:
 	# cargo watch -x check -x clippy -x "test -- --test-threads 1"
 	cargo watch -x build -x clippy -x
 
+test:
+	# no parallel test possible because of the clean_db() dependency of integration tests
+	cargo test  -- --test-threads 1
+
 db-migrate:
 	SKIP_DOCKER=true ./scripts/init_db.sh
 

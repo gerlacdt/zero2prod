@@ -15,7 +15,7 @@ db-run:
 	./scripts/init_db.sh
 
 redis-run:
-	./scrips/init_redis.sh
+	./scripts/init_redis.sh
 
 db-connect:
 	PGPASSWORD=password psql -h localhost -p 5431 -U postgres -d newsletter

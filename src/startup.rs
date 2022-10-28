@@ -1,7 +1,10 @@
 use crate::authentication::reject_anonymous_users;
 use crate::configuration::DatabaseSettings;
 use crate::email_client::EmailClient;
-use crate::routes::{admin_dashboard, change_password, change_password_form, log_out};
+use crate::routes::{
+    admin_dashboard, change_password, change_password_form, log_out, publish_newsletter,
+    publish_newsletter_form,
+};
 use crate::{configuration::Settings, routes};
 use actix_session::storage::RedisSessionStore;
 use actix_session::SessionMiddleware;
@@ -96,21 +99,22 @@ async fn run(
                 secret_key.clone(),
             ))
             .wrap(TracingLogger::default())
-            .route("/health_check", web::get().to(routes::health_check))
-            .route("/subscriptions", web::post().to(routes::subscribe))
-            .route("/subscriptions/confirm", web::get().to(routes::confirm))
-            .route("/newsletters", web::post().to(routes::publish_newsletter))
             .route("/", web::get().to(routes::home))
-            .route("/login", web::get().to(routes::login_form))
-            .route("/login", web::post().to(routes::login))
             .service(
                 web::scope("/admin")
                     .wrap(from_fn(reject_anonymous_users))
                     .route("/logout", web::post().to(log_out))
                     .route("/dashboard", web::get().to(admin_dashboard))
                     .route("/password", web::get().to(change_password_form))
-                    .route("/password", web::post().to(change_password)),
+                    .route("/password", web::post().to(change_password))
+                    .route("/newsletters", web::post().to(publish_newsletter))
+                    .route("/newsletters", web::get().to(publish_newsletter_form)),
             )
+            .route("/login", web::get().to(routes::login_form))
+            .route("/login", web::post().to(routes::login))
+            .route("/health_check", web::get().to(routes::health_check))
+            .route("/subscriptions", web::post().to(routes::subscribe))
+            .route("/subscriptions/confirm", web::get().to(routes::confirm))
             .app_data(connection.clone())
             .app_data(email_client.clone())
             .app_data(base_url.clone())

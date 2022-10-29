@@ -225,9 +225,14 @@ pub async fn clean_db() {
         .expect("Failed to cleanup database, table: subscriptions.");
 
     connection
+        .execute("DELETE FROM idempotency;")
+        .await
+        .expect("Failed to cleanup database, table: idempotency.");
+
+    connection
         .execute("DELETE FROM users where username != 'admin';")
         .await
-        .expect("Failed to cleanup database, table: subscriptions.");
+        .expect("Failed to cleanup database, table: users.");
 }
 
 pub struct TestUser {

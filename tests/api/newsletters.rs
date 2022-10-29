@@ -166,5 +166,7 @@ async fn newsletter_creation_is_idempotent() {
 
     // Act - Part 4 - Follow the redirect
     let html_page = app.get_publish_newsletter_html().await;
+
+    println!("last HTML: {}", html_page);
     assert!(html_page.contains("<p><i>The newsletter issue has been published!</i></p>"));
 }
